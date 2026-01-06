@@ -25,6 +25,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Trust proxy for Render (needed for secure cookies behind proxy)
+app.set('trust proxy', 1);
+
 // Session middleware - MUST be before routes
 app.use(
   session({
@@ -35,7 +38,7 @@ app.use(
       secure: process.env.NODE_ENV === 'production', // true in production with HTTPS
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
-      sameSite: 'lax'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' for cross-site in production
     },
     name: 'portfolio.sid' // Custom cookie name
   })

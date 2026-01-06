@@ -32,7 +32,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, // Set to true in production with HTTPS
+      secure: process.env.NODE_ENV === 'production', // true in production with HTTPS
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
       sameSite: 'lax'
@@ -41,10 +41,10 @@ app.use(
   })
 );
 
-// Serve static files - backend public folder
-app.use(express.static("public"));
-// Serve frontend files from root
-app.use(express.static(path.join(__dirname, "..")));
+// Serve static files - public folder for admin pages
+app.use(express.static(path.join(__dirname, "public")));
+// Serve frontend files from current directory (same as server.js)
+app.use(express.static(__dirname));
 
 // API routes - MUST be before catch-all routes
 app.use("/api/admin", adminRoutes);
@@ -79,12 +79,12 @@ app.get("/admin/dashboard", (req, res) => {
 
 // Serve projects page
 app.get("/projects", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "projects.html"));
+  res.sendFile(path.join(__dirname, "projects.html"));
 });
 
 // Serve main index.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Check authentication middleware for protected API routes
